@@ -3,6 +3,9 @@ extern crate bytes;
 extern crate curl;
 extern crate serde_json;
 extern crate toml;
+extern crate simple_logger;
+use simple_logger::SimpleLogger;
+extern crate log;
 
 #[macro_use]
 extern crate lazy_static;
@@ -26,6 +29,7 @@ static RUST_VERSION: Option<&'static str> = option_env!("RUST_VERSION");
 static VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 fn main() {
+    SimpleLogger::new().env().init().unwrap();
     let version_info = if BUILD_TIME.is_some() {
         format!(
             "  version   : {}\n  revision  : {}\n  build time: {}\n",

@@ -4,6 +4,7 @@ use serde_json;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::error::Error;
+use log;
 
 pub struct EnvoyReader<'a> {
     url: &'a str,
@@ -13,7 +14,7 @@ pub struct EnvoyReader<'a> {
 }
 
 impl<'a> EnvoyReader<'a> {
-    pub fn status(url: &'a str, user: &'a str, pass: &'a str) -> Result<EnvoyStatus, Box<Error>> {
+    pub fn status(url: &'a str, user: &'a str, pass: &'a str) -> Result<EnvoyStatus, Box<dyn Error>> {
         let mut reader = EnvoyReader {
             url,
             user,
@@ -26,7 +27,7 @@ impl<'a> EnvoyReader<'a> {
         Ok(reader.status)
     }
 
-    fn fetch_json(&self, suffix: &str) -> Result<Value, Box<Error>> {
+    fn fetch_json(&self, suffix: &str) -> Result<Value, Box<dyn Error>> {
         let url = self.url.to_owned() + suffix;
         let mut auth = Auth::new();
         auth.digest(true);
@@ -50,7 +51,7 @@ impl<'a> EnvoyReader<'a> {
         Ok(json)
     }
 
-    fn production(&mut self) -> Result<(), Box<Error>> {
+    fn production(&mut self) -> Result<(), Box<dyn Error>> {
         let json: Value = self.fetch_json("/api/v1/production")?;
         self.status.watt_hours_lifetime = json["wattHoursLifetime"].as_i64().unwrap();
         self.status.watt_hours_today = json["wattHoursToday"].as_i64().unwrap();
@@ -58,8 +59,9 @@ impl<'a> EnvoyReader<'a> {
         Ok(())
     }
 
-    fn inverters(&mut self) -> Result<(), Box<Error>> {
+    fn inverters(&mut self) -> Result<(), Box<dyn Error>> {
         let json: Value = self.fetch_json("/api/v1/production/inverters")?;
+        log::debug!("Receive {:?}", json);
         let inverters = json.as_array().unwrap();
         for inverter in inverters {
             let sn = inverter["serialNumber"].as_str().unwrap();
