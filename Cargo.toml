@@ -1,6 +1,6 @@
 [package]
 name = "envoy-exporter"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Ben Alex <ben.alex@acegi.com.au>"]
 repository = "https://github.com/benalexau/envoy-exporter"
 license = "MIT"
@@ -17,3 +17,9 @@ serde        = "1.0"
 serde_derive = "1.0"
 serde_json   = "1.0"
 toml         = "0.4"
+simple_logger= "2.1"
+log          = "0.4"
+openssl = { version = '0.10', optional = true }
+
+[features]
+vendored-openssl = ["openssl/vendored"]
