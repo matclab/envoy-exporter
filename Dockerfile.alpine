@@ -1,0 +1,5 @@
+FROM alpine
+COPY target/aarch64-unknown-linux-musl/release/envoy-exporter /envoy-exporter
+ENTRYPOINT [ "/envoy-exporter" ]
+CMD [ "/etc/config.toml" ]
+
