@@ -1,5 +1,4 @@
 use actix_web::{http::ContentEncoding, HttpRequest, HttpResponse};
-use bytes::Bytes;
 use config::System;
 use envoy_reader::EnvoyReader;
 use prometheus;
@@ -98,11 +97,11 @@ pub fn metrics(req: &HttpRequest<Vec<System>>) -> HttpResponse {
 
     let metric_families = prometheus::gather();
     let encoder = TextEncoder::new();
-    let mut buffer = vec![];
+    let mut buffer : Vec<u8> = vec![];
     encoder.encode(&metric_families, &mut buffer).unwrap();
 
     HttpResponse::Ok()
         .content_encoding(ContentEncoding::Auto)
         .content_type(encoder.format_type())
-        .body(Bytes::from(buffer))
+        .body(buffer)
 }
