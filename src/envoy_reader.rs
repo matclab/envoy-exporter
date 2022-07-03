@@ -22,6 +22,7 @@ impl<'a> EnvoyReader<'a> {
             status: EnvoyStatus::new(),
         };
         reader.production()?;
+        reader.consumption()?;
         reader.inverters()?;
         reader.status.online = true;
         Ok(reader.status)
@@ -59,6 +60,14 @@ impl<'a> EnvoyReader<'a> {
         Ok(())
     }
 
+    fn consumption(&mut self) -> Result<(), Box<dyn Error>> {
+        let json: Value = self.fetch_json("/api/v1/consumption")?;
+        self.status.watt_hours_lifetime_consumption = json["wattHoursLifetime"].as_i64().unwrap();
+        self.status.watt_hours_today_consumption = json["wattHoursToday"].as_i64().unwrap();
+        self.status.watts_now_consumption = json["wattsNow"].as_i64().unwrap();
+        Ok(())
+    }
+
     fn inverters(&mut self) -> Result<(), Box<dyn Error>> {
         let json: Value = self.fetch_json("/api/v1/production/inverters")?;
         log::debug!("Receive {:?}", json);
@@ -78,6 +87,9 @@ pub struct EnvoyStatus {
     pub watt_hours_lifetime: i64,
     pub watt_hours_today: i64,
     pub watts_now: i64,
+    pub watt_hours_lifetime_consumption: i64,
+    pub watt_hours_today_consumption: i64,
+    pub watts_now_consumption: i64,
     pub inverters: HashMap<String, i64>,
 }
 
@@ -88,6 +100,9 @@ impl EnvoyStatus {
             watt_hours_lifetime: 0,
             watt_hours_today: 0,
             watts_now: 0,
+            watt_hours_lifetime_consumption: 0,
+            watt_hours_today_consumption: 0,
+            watts_now_consumption: 0,
             inverters: HashMap::new(),
         }
     }

@@ -34,6 +34,21 @@ lazy_static! {
         "Number of watt hours ever produced",
         &["host", "envoy"]
     ).unwrap();
+    static ref CURRENT_WATTS_CONSUMPTION: IntGaugeVec = register_int_gauge_vec!(
+        "envoy_current_watts_consumption",
+        "Number of watts being consumed",
+        &["host", "envoy"]
+    ).unwrap();
+    static ref TODAY_WATT_HOURS_CONSUMPTION: IntGaugeVec = register_int_gauge_vec!(
+        "envoy_today_watt_hours_consumed",
+        "Number of watt hours consumed today",
+        &["host", "envoy"]
+    ).unwrap();
+    static ref LIFETIME_WATT_HOURS_CONSUMPTION: IntGaugeVec = register_int_gauge_vec!(
+        "envoy_lifetime_watt_hours_consumed",
+        "Number of watt hours ever consumed",
+        &["host", "envoy"]
+    ).unwrap();
     static ref INVERTER_LAST_WATTS: IntGaugeVec = register_int_gauge_vec!(
         "envoy_inverter_last_watts",
         "Number of watts last reported produced by an inverter",
@@ -83,6 +98,15 @@ pub fn metrics(req: &HttpRequest<Vec<System>>) -> HttpResponse {
         TODAY_WATT_HOURS
             .with_label_values(&[&host, &sn])
             .set(status.watt_hours_today);
+        CURRENT_WATTS_CONSUMPTION
+            .with_label_values(&[&host, &sn])
+            .set(status.watts_now_consumption);
+        LIFETIME_WATT_HOURS_CONSUMPTION
+            .with_label_values(&[&host, &sn])
+            .set(status.watt_hours_lifetime_consumption);
+        TODAY_WATT_HOURS_CONSUMPTION
+            .with_label_values(&[&host, &sn])
+            .set(status.watt_hours_today_consumption);
         for (inverter_serial, watts) in status.inverters {
             INVERTER_LAST_WATTS
                 .with_label_values(&[&host, &sn, inverter_serial.as_str()])
