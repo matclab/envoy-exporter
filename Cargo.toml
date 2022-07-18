@@ -6,6 +6,7 @@ repository = "https://github.com/benalexau/envoy-exporter"
 license = "MIT"
 readme = "README.md"
 description = "Prometheus exporter for Enphase Envoy Gateway"
+edition = "2021"
 
 [dependencies]
 prometheus   = "0.13.1"

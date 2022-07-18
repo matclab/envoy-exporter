@@ -1,12 +1,12 @@
 use actix_web::{http::ContentEncoding, HttpRequest, HttpResponse};
-use config::System;
-use envoy_reader::EnvoyReader;
+use crate::config::System;
+use crate::envoy_reader::EnvoyReader;
 use prometheus;
 use prometheus::{Encoder, GaugeVec, IntGaugeVec, TextEncoder};
 
-use GIT_REVISION;
-use RUST_VERSION;
-use VERSION;
+use crate::GIT_REVISION;
+use crate::RUST_VERSION;
+use crate::VERSION;
 
 lazy_static! {
     static ref BUILD_INFO: GaugeVec = register_gauge_vec!(

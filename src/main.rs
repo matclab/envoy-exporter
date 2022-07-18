@@ -18,8 +18,8 @@ mod envoy_reader;
 mod handlers;
 
 use actix_web::{server, App};
-use config::Config;
-use handlers::{index, metrics};
+use crate::config::Config;
+use crate::handlers::{index, metrics};
 use std::env;
 
 static BUILD_TIME: Option<&'static str> = option_env!("BUILD_TIME");
