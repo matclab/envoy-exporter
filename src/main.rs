@@ -21,14 +21,15 @@ use actix_web::{server, App};
 use crate::config::Config;
 use crate::handlers::{index, metrics};
 use std::env;
+use anyhow::{bail,Result, Context};
 
 static BUILD_TIME: Option<&'static str> = option_env!("BUILD_TIME");
 static GIT_REVISION: Option<&'static str> = option_env!("GIT_REVISION");
 static RUST_VERSION: Option<&'static str> = option_env!("RUST_VERSION");
 static VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
-fn main() {
-    SimpleLogger::new().env().init().unwrap();
+fn main() -> Result<()>{
+    SimpleLogger::new().env().init()?;
     let version_info = if BUILD_TIME.is_some() {
         format!(
             "  version   : {}\n  revision  : {}\n  build time: {}\n",
@@ -44,16 +45,11 @@ fn main() {
     if args.len() < 2 {
         println!("Usage: envoy-exporter [config_file]");
         println!("\n{}", version_info);
-        return;
+        bail!("Not enough arguments");
     }
 
-    let config = match Config::from_file(&args[1]) {
-        Ok(x) => x,
-        Err(x) => {
-            println!("Could not read '{}': {}", &args[1], x);
-            return;
-        }
-    };
+    let config =Config::from_file(&args[1]).with_context( || format!("Reading '{}'", &args[1]))?;
+
 
     let addr = format!("0.0.0.0:{}", config.listen_port.unwrap_or(9422));
 
@@ -63,7 +59,7 @@ fn main() {
         App::with_state(config.systems.clone())
             .resource("/", |r| r.f(index))
             .resource("/metrics", |r| r.f(metrics))
-    }).bind(addr)
-        .unwrap()
+    }).bind(addr)?
         .run();
+    Ok(())
 }

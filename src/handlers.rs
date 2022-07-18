@@ -122,7 +122,10 @@ pub fn metrics(req: &HttpRequest<Vec<System>>) -> HttpResponse {
     let metric_families = prometheus::gather();
     let encoder = TextEncoder::new();
     let mut buffer : Vec<u8> = vec![];
-    encoder.encode(&metric_families, &mut buffer).unwrap();
+    match encoder.encode(&metric_families, &mut buffer) {
+        Ok(_) => () ,
+        Err(_) => buffer="['Unable to encode']".into(),
+    };
 
     HttpResponse::Ok()
         .content_encoding(ContentEncoding::Auto)

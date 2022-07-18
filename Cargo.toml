@@ -1,6 +1,6 @@
 [package]
 name = "envoy-exporter"
-version = "0.0.6"
+version = "0.0.7"
 authors = ["Ben Alex <ben.alex@acegi.com.au>"]
 repository = "https://github.com/benalexau/envoy-exporter"
 license = "MIT"
@@ -20,6 +20,7 @@ toml         = "0.5.9"
 simple_logger= "2.1.0"
 log          = "0.4.17"
 openssl = { version = "0.10.40", optional = true }
+anyhow = "1.0.58"
 
 [features]
 vendored-openssl = ["openssl/vendored"]
