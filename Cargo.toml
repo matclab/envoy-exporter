@@ -1,6 +1,6 @@
 [package]
 name = "envoy-exporter"
-version = "0.0.7"
+version = "0.0.8"
 authors = ["Ben Alex <ben.alex@acegi.com.au>"]
 repository = "https://github.com/benalexau/envoy-exporter"
 license = "MIT"
@@ -9,18 +9,18 @@ description = "Prometheus exporter for Enphase Envoy Gateway"
 edition = "2021"
 
 [dependencies]
-prometheus   = "0.13.1"
+prometheus   = "0.13.3"
 lazy_static  = "1.4.0"
 actix-web    = "0.7"
-curl         = "0.4.43"
-serde        = "1.0.138"
-serde_derive = "1.0.138"
-serde_json   = "1.0.82"
-toml         = "0.5.9"
-simple_logger= "2.1.0"
+curl         = "0.4.44"
+serde        = "1.0.152"
+serde_derive = "1.0.152"
+serde_json   = "1.0.91"
+toml         = "0.5.11"
+simple_logger= "2.3.0"
 log          = "0.4.17"
-openssl = { version = "0.10.40", optional = true }
-anyhow = "1.0.58"
+openssl = { version = "0.10.45", optional = true }
+anyhow = "1.0.68"
 
 [features]
 vendored-openssl = ["openssl/vendored"]
