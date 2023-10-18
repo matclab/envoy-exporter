@@ -1,5 +1,3 @@
-use curl::easy::Auth;
-use curl::easy::Easy;
 use serde_json;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -30,24 +28,10 @@ impl<'a> EnvoyReader<'a> {
 
     fn fetch_json(&self, suffix: &str) -> Result<Value> {
         let url = self.url.to_owned() + suffix;
-        let mut auth = Auth::new();
-        auth.digest(true);
-        let mut handle = Easy::new();
-        handle.http_auth(&auth)?;
-        handle.username(self.user)?;
-        handle.password(self.pass)?;
-        handle.url(&url)?;
-        let mut data = Vec::new();
-        {
-            let mut transfer = handle.transfer();
-            transfer
-                .write_function(|new_data| {
-                    data.extend_from_slice(new_data);
-                    Ok(new_data.len())
-                })?;
-            transfer.perform()?;
-        }
-        let json: Value = serde_json::from_slice(&data)?;
+        let json: serde_json::Value = ureq::get(&url)
+            .set("Authorization", &("Bearer ".to_owned() + &self.system.token))
+            .call()?
+            .into_json()?;
         Ok(json)
     }
 

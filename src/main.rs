@@ -1,5 +1,4 @@
 extern crate actix_web;
-extern crate curl;
 extern crate serde_json;
 extern crate toml;
 extern crate simple_logger;
