@@ -3,20 +3,17 @@ use serde_json::Value;
 use std::collections::HashMap;
 use anyhow::{Context, Result};
 use log;
+use crate::config::System;
 
 pub struct EnvoyReader<'a> {
-    url: &'a str,
-    user: &'a str,
-    pass: &'a str,
+    system: &'a System,
     status: EnvoyStatus,
 }
 
 impl<'a> EnvoyReader<'a> {
-    pub fn status(url: &'a str, user: &'a str, pass: &'a str) -> Result<EnvoyStatus> {
+    pub fn status(system: &'a System) -> Result<EnvoyStatus> {
         let mut reader = EnvoyReader {
-            url,
-            user,
-            pass,
+            system,
             status: EnvoyStatus::new(),
         };
         reader.production()?;
@@ -27,7 +24,7 @@ impl<'a> EnvoyReader<'a> {
     }
 
     fn fetch_json(&self, suffix: &str) -> Result<Value> {
-        let url = self.url.to_owned() + suffix;
+        let url = self.system.url.to_owned() + suffix;
         let json: serde_json::Value = ureq::get(&url)
             .set("Authorization", &("Bearer ".to_owned() + &self.system.token))
             .call()?

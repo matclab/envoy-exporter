@@ -73,43 +73,38 @@ pub fn index(_req: &HttpRequest<Vec<System>>) -> HttpResponse {
 
 pub fn metrics(req: &HttpRequest<Vec<System>>) -> HttpResponse {
     for sys in req.state().clone() {
-        let host = sys.host.unwrap_or(String::from(""));
-        let url = sys.url.unwrap_or(String::from(""));
-        let user = sys.user.unwrap_or(String::from(""));
-        let pass = sys.pass.unwrap_or(String::from(""));
-        let sn = sys.sn.unwrap_or(String::from(""));
-        let status = match EnvoyReader::status(&url, &user, &pass) {
+        let status = match EnvoyReader::status(&sys) {
             Ok(x) => x,
             Err(x) => {
-                ONLINE.with_label_values(&[&host, &sn]).set(0);
-                println!("{} failed: {}", host, x);
+                ONLINE.with_label_values(&[&sys.host, &sys.sn]).set(0);
+                println!("{} failed: {}", sys.host, x);
                 continue;
             }
         };
         ONLINE
-            .with_label_values(&[&host, &sn])
+            .with_label_values(&[&sys.host, &sys.sn])
             .set(if status.online { 1 } else { 0 });
         CURRENT_WATTS
-            .with_label_values(&[&host, &sn])
+            .with_label_values(&[&sys.host, &sys.sn])
             .set(status.watts_now);
         LIFETIME_WATT_HOURS
-            .with_label_values(&[&host, &sn])
+            .with_label_values(&[&sys.host, &sys.sn])
             .set(status.watt_hours_lifetime);
         TODAY_WATT_HOURS
-            .with_label_values(&[&host, &sn])
+            .with_label_values(&[&sys.host, &sys.sn])
             .set(status.watt_hours_today);
         CURRENT_WATTS_CONSUMPTION
-            .with_label_values(&[&host, &sn])
+            .with_label_values(&[&sys.host, &sys.sn])
             .set(status.watts_now_consumption);
         LIFETIME_WATT_HOURS_CONSUMPTION
-            .with_label_values(&[&host, &sn])
+            .with_label_values(&[&sys.host, &sys.sn])
             .set(status.watt_hours_lifetime_consumption);
         TODAY_WATT_HOURS_CONSUMPTION
-            .with_label_values(&[&host, &sn])
+            .with_label_values(&[&sys.host, &sys.sn])
             .set(status.watt_hours_today_consumption);
         for (inverter_serial, watts) in status.inverters {
             INVERTER_LAST_WATTS
-                .with_label_values(&[&host, &sn, inverter_serial.as_str()])
+                .with_label_values(&[&sys.host, &sys.sn, inverter_serial.as_str()])
                 .set(watts);
         }
     }
