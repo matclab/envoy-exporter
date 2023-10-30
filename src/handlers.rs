@@ -1,7 +1,6 @@
 use actix_web::{http::ContentEncoding, HttpRequest, HttpResponse};
-use crate::config::System;
+use crate::config::Config;
 use crate::envoy_reader::EnvoyReader;
-use prometheus;
 use prometheus::{Encoder, GaugeVec, IntGaugeVec, TextEncoder};
 
 use crate::GIT_REVISION;
@@ -56,7 +55,7 @@ lazy_static! {
     ).unwrap();
 }
 
-static LANDING_PAGE: &'static str = "<html>
+static LANDING_PAGE: &str = "<html>
 <head><title>Enphase Envoy Exporter</title></head>
 <body>
 <h1>Enphase Envoy Exporter</h1>
@@ -64,16 +63,17 @@ static LANDING_PAGE: &'static str = "<html>
 </body>
 ";
 
-pub fn index(_req: &HttpRequest<Vec<System>>) -> HttpResponse {
+pub fn index(_req: &HttpRequest<Config>) -> HttpResponse {
     HttpResponse::Ok()
         .content_encoding(ContentEncoding::Auto)
         .content_type("text/html")
         .body(LANDING_PAGE)
 }
 
-pub fn metrics(req: &HttpRequest<Vec<System>>) -> HttpResponse {
-    for sys in req.state().clone() {
-        let status = match EnvoyReader::status(&sys) {
+pub fn metrics(req: &HttpRequest<Config>) -> HttpResponse {
+    let state = req.state().clone();
+    for sys in state.systems {
+        let status = match EnvoyReader::status(&sys, &state.agent) {
             Ok(x) => x,
             Err(x) => {
                 ONLINE.with_label_values(&[&sys.host, &sys.sn]).set(0);

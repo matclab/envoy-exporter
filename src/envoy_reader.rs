@@ -1,20 +1,20 @@
-use serde_json;
 use serde_json::Value;
 use std::collections::HashMap;
 use anyhow::{Context, Result};
-use log;
 use crate::config::System;
 
 pub struct EnvoyReader<'a> {
     system: &'a System,
     status: EnvoyStatus,
+    agent: &'a ureq::Agent,
 }
 
 impl<'a> EnvoyReader<'a> {
-    pub fn status(system: &'a System) -> Result<EnvoyStatus> {
+    pub fn status(system: &'a System, agent: &'a ureq::Agent) -> Result<EnvoyStatus> {
         let mut reader = EnvoyReader {
             system,
             status: EnvoyStatus::new(),
+            agent
         };
         reader.production()?;
         reader.consumption()?;
@@ -25,7 +25,7 @@ impl<'a> EnvoyReader<'a> {
 
     fn fetch_json(&self, suffix: &str) -> Result<Value> {
         let url = self.system.url.to_owned() + suffix;
-        let json: serde_json::Value = ureq::get(&url)
+        let json: serde_json::Value = self.agent.get(&url)
             .set("Authorization", &("Bearer ".to_owned() + &self.system.token))
             .call()?
             .into_json()?;

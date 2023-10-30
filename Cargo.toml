@@ -1,6 +1,6 @@
 [package]
 name = "envoy-exporter"
-version = "0.0.8"
+version = "0.0.9"
 authors = ["Ben Alex <ben.alex@acegi.com.au>"]
 repository = "https://github.com/benalexau/envoy-exporter"
 license = "MIT"
@@ -15,12 +15,9 @@ actix-web    = "0.7"
 serde        = "1.0.189"
 serde_derive = "1.0.189"
 serde_json   = "1.0.107"
-toml         = "0.5.11"
-simple_logger= "2.3.0"
+toml         = "0.8.2"
+simple_logger= "4.2.0"
 log          = "0.4.20"
-openssl = { version = "0.10.57", optional = true }
 anyhow = "1.0.75"
 ureq = { version = "2.8.0", features = ["json"] }
-
-[features]
-vendored-openssl = ["openssl/vendored"]
+rustls = { version = "0.21", features = ["dangerous_configuration"] }
